@@ -263,8 +263,14 @@ h3 {
 .heroReel strong {
   max-width: 280px;
   margin-top: 12px;
-  font-size: 2.45rem;
+  font-size: 3.4rem;
   line-height: 1;
+}
+
+.heroReel small {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.78);
+  font-weight: 850;
 }
 
 .heroMini {
@@ -290,6 +296,20 @@ h3 {
 .heroMini strong {
   font-size: 4.6rem;
   line-height: 0.9;
+}
+
+.contactCard {
+  gap: 10px;
+}
+
+.contactCard strong {
+  font-size: 1.42rem;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+.contactCard svg {
+  color: white;
 }
 
 .categoryRail {

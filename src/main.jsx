@@ -2,7 +2,6 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   ArrowUpRight,
-  BadgeCheck,
   Clapperboard,
   FolderOpen,
   Mail,
@@ -140,6 +139,9 @@ function App() {
             <a className="primaryBtn" href="https://wa.me/60178708152">
               <MessageCircle size={20} /> Hire me
             </a>
+            <a className="secondaryBtn" href="mailto:shafinhaque123456@gmail.com">
+              <Mail size={20} /> Email
+            </a>
             <a className="secondaryBtn" href="#work">
               <Clapperboard size={20} /> Watch samples
             </a>
@@ -150,15 +152,17 @@ function App() {
           <div className="heroReel">
             <Play size={30} fill="currentColor" />
             <span>Featured reel</span>
-            <strong>Showreel placeholder</strong>
+            <strong>Showreel</strong>
+            <small>YouTube embed placeholder</small>
           </div>
-          <div className="heroMini dark">
-            <strong>5+</strong>
-            <span>Portfolio categories</span>
+          <div className="heroMini dark contactCard">
+            <span>WhatsApp</span>
+            <strong>+60 17 870 8152</strong>
           </div>
-          <div className="heroMini warm">
-            <BadgeCheck size={24} />
-            <span>Hooks, pacing, captions, thumbnails</span>
+          <div className="heroMini warm contactCard">
+            <Mail size={24} />
+            <span>Email</span>
+            <strong>shafinhaque123456@gmail.com</strong>
           </div>
         </div>
       </section>
