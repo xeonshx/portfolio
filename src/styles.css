@@ -118,12 +118,17 @@ p {
 }
 
 h1 {
-  max-width: 650px;
+  max-width: 720px;
   margin-bottom: 22px;
-  font-size: clamp(3.9rem, 7vw, 7.6rem);
-  line-height: 0.9;
+  font-size: clamp(3.4rem, 6.1vw, 6.7rem);
+  line-height: 0.98;
   letter-spacing: 0;
   font-weight: 950;
+}
+
+h1 span {
+  color: var(--brown);
+  font-style: italic;
 }
 
 h2 {
@@ -145,8 +150,9 @@ h3 {
   max-width: 590px;
   margin-bottom: 18px;
   color: var(--muted);
-  font-size: 1.18rem;
-  line-height: 1.68;
+  font-size: 1.28rem;
+  line-height: 1.45;
+  font-weight: 750;
 }
 
 .heroProof,
@@ -299,7 +305,6 @@ h3 {
 }
 
 .work,
-.aiCreative,
 .clients,
 .contact {
   width: min(1160px, calc(100% - 32px));
@@ -313,7 +318,6 @@ h3 {
 }
 
 .sectionHeader p,
-.aiCreative p,
 .split p {
   color: var(--muted);
   line-height: 1.6;
@@ -326,23 +330,23 @@ h3 {
 
 .reelRow {
   display: grid;
-  grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.55fr);
-  gap: 18px;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 14px;
   align-items: stretch;
-  padding: 18px;
+  padding: 14px;
   border: 1px solid var(--line);
-  border-radius: 34px;
+  border-radius: 30px;
   background: rgba(255, 250, 240, 0.72);
   box-shadow: 0 18px 44px rgba(23, 23, 22, 0.07);
 }
 
 .reelIntro {
   display: flex;
-  min-height: 360px;
+  min-height: 0;
   flex-direction: column;
-  justify-content: flex-end;
-  padding: 24px;
-  border-radius: 26px;
+  justify-content: center;
+  padding: 18px;
+  border-radius: 22px;
   background: var(--ink);
   color: white;
 }
@@ -353,13 +357,19 @@ h3 {
 }
 
 .reelIntro h3 {
-  margin-bottom: 18px;
+  margin-bottom: 12px;
+  font-size: clamp(1.65rem, 2.2vw, 2.35rem);
+  line-height: 0.98;
 }
 
 .reelGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(180px, 1fr)) minmax(130px, 0.52fr);
   gap: 14px;
+}
+
+.reelRow.wide .reelGrid {
+  grid-template-columns: minmax(0, 1fr) minmax(145px, 0.28fr);
 }
 
 .videoCard,
@@ -378,13 +388,18 @@ h3 {
 .videoChrome {
   position: relative;
   display: grid;
-  min-height: 300px;
+  min-height: 0;
+  aspect-ratio: 9 / 16;
   place-items: center;
   overflow: hidden;
   border-radius: 20px;
   background:
     linear-gradient(150deg, rgba(23, 23, 22, 0.04), rgba(23, 23, 22, 0.38)),
     var(--accent);
+}
+
+.videoCard.wide .videoChrome {
+  aspect-ratio: 16 / 9;
 }
 
 .mint {
@@ -476,35 +491,6 @@ h3 {
   font-weight: 850;
 }
 
-.aiCreative {
-  display: grid;
-  grid-template-columns: 0.9fr 1.35fr;
-  gap: 24px;
-  align-items: start;
-}
-
-.capabilityPanel {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.capabilityPanel article {
-  min-height: 260px;
-  padding: 22px;
-  border: 1px solid var(--line);
-  border-radius: 30px;
-  background: var(--surface);
-}
-
-.capabilityPanel strong {
-  display: block;
-  color: var(--brown);
-  font-size: 1.45rem;
-  line-height: 1.08;
-  font-weight: 950;
-}
-
 .split {
   display: grid;
   grid-template-columns: 0.7fr 1fr;
@@ -555,7 +541,6 @@ h3 {
 @media (max-width: 1020px) {
   .hero,
   .reelRow,
-  .aiCreative,
   .split {
     grid-template-columns: 1fr;
   }
@@ -571,6 +556,10 @@ h3 {
   .reelGrid,
   .clientGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .reelRow.wide .reelGrid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -590,12 +579,11 @@ h3 {
   }
 
   h1 {
-    font-size: 3.5rem;
+    font-size: 3.05rem;
   }
 
   .heroBoard,
   .reelGrid,
-  .capabilityPanel,
   .clientGrid {
     grid-template-columns: 1fr;
   }
