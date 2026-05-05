@@ -6,6 +6,7 @@ import {
   Clapperboard,
   FolderOpen,
   Mail,
+  MessageCircle,
   Play,
   Sparkles,
 } from 'lucide-react';
@@ -16,28 +17,28 @@ const categories = ['Video Editor', 'UGC Editor', 'Brand Ads', 'YouTube', 'VSL',
 const showreels = [
   {
     title: 'UGC Ads',
-    summary: 'Paid social edits with hooks, captions, and proof.',
+    label: 'UGC',
     accent: 'mint',
     moreUrl: 'https://photos.app.goo.gl/YPPkXLnuWomS3PSTA',
     samples: ['Creator testimonial', 'Problem-solution ad', 'Social proof montage'],
   },
   {
     title: 'HYPE Ads',
-    summary: 'Fast, loud, high-retention cuts.',
+    label: 'HYPE',
     accent: 'lime',
     moreUrl: '#contact',
     samples: ['Sports highlight', 'Lifestyle hype cut', 'App/product motion ad'],
   },
   {
     title: 'Voiceover & Bilingual Ads',
-    summary: 'Voice-led ads with clean subtitles.',
+    label: 'Voiceover',
     accent: 'sky',
     moreUrl: 'https://photos.app.goo.gl/YPPkXLnuWomS3PSTA',
     samples: ['Founder voiceover', 'Bilingual explainer', 'Narrative testimonial'],
   },
   {
     title: 'Video Sales Letter (VSL)',
-    summary: 'One wide VSL slot for long-form sales edits.',
+    label: 'VSL',
     accent: 'orange',
     moreUrl: 'https://photos.app.goo.gl/Fu2JqKmgsPzQyUDR6',
     format: '16:9',
@@ -46,7 +47,7 @@ const showreels = [
   },
   {
     title: 'Podcast & AI Ads',
-    summary: 'Podcast clips and AI-assisted ad concepts.',
+    label: 'Podcast + AI',
     accent: 'pink',
     moreUrl: '#contact',
     samples: ['Podcast clip', 'AI concept ad', 'Talking-head authority edit'],
@@ -75,7 +76,6 @@ function VideoPlaceholder({ label, index, accent, format = '9:16', layout = 'por
         <span className="videoIndex">{String(index + 1).padStart(2, '0')}</span>
       </div>
       <h4>{label}</h4>
-      <p>YouTube embed placeholder</p>
     </article>
   );
 }
@@ -87,8 +87,7 @@ function ShowreelRow({ reel }) {
       id={reel.title.toLowerCase().replaceAll(' ', '-')}
     >
       <div className="reelIntro">
-        <h3>{reel.title}</h3>
-        <p>{reel.summary}</p>
+        <h3>{reel.label}</h3>
       </div>
       <div className="reelGrid">
         {reel.samples.map((sample, index) => (
@@ -104,7 +103,6 @@ function ShowreelRow({ reel }) {
         <a className={`folderCard ${reel.accent}`} href={reel.moreUrl}>
           <FolderOpen size={44} />
           <span>More here</span>
-          <small>Folder / full set placeholder</small>
         </a>
       </div>
     </section>
@@ -139,8 +137,8 @@ function App() {
             <span>AI Creative</span>
           </div>
           <div className="heroActions">
-            <a className="primaryBtn" href="mailto:shafinhaque123456@gmail.com">
-              <Mail size={20} /> Hire me
+            <a className="primaryBtn" href="https://wa.me/60178708152">
+              <MessageCircle size={20} /> Hire me
             </a>
             <a className="secondaryBtn" href="#work">
               <Clapperboard size={20} /> Watch samples
@@ -179,13 +177,35 @@ function App() {
             <Clapperboard size={18} /> Selected work
           </p>
           <h2>Video showreels</h2>
-          <p>Three samples per category, with a folder card for the full set.</p>
         </div>
 
         <div className="showreelStack">
           {showreels.map((reel) => (
             <ShowreelRow key={reel.title} reel={reel} />
           ))}
+        </div>
+      </section>
+
+      <section id="ai-creative" className="aiCreative">
+        <div className="aiCopy">
+          <p className="eyebrow">
+            <Sparkles size={18} /> AI creative
+          </p>
+          <h2>More angles. Faster tests.</h2>
+        </div>
+        <div className="aiGrid">
+          <article>
+            <strong>Hook ideas</strong>
+            <span>More openings to test.</span>
+          </article>
+          <article>
+            <strong>Script routes</strong>
+            <span>Cleaner ad structure.</span>
+          </article>
+          <article>
+            <strong>Visual concepts</strong>
+            <span>References before the edit.</span>
+          </article>
         </div>
       </section>
 
@@ -210,8 +230,11 @@ function App() {
           </p>
           <h2>Send the YouTube links later. The slots are ready.</h2>
         </div>
-        <a className="primaryBtn" href="mailto:shafinhaque123456@gmail.com">
-          shafinhaque123456@gmail.com <ArrowUpRight size={20} />
+        <a className="primaryBtn" href="https://wa.me/60178708152">
+          WhatsApp me <ArrowUpRight size={20} />
+        </a>
+        <a className="secondaryBtn contactEmail" href="mailto:shafinhaque123456@gmail.com">
+          <Mail size={20} /> Email
         </a>
       </section>
     </main>
