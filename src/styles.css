@@ -226,7 +226,7 @@ h3 {
 }
 
 .heroReel,
-.heroVisual {
+.heroMini {
   border: 1px solid var(--line);
   box-shadow: 0 24px 60px rgba(23, 23, 22, 0.12);
 }
@@ -255,7 +255,7 @@ h3 {
 }
 
 .heroReel span,
-.heroVisual span {
+.heroMini span {
   color: rgba(255, 255, 255, 0.82);
   font-weight: 850;
 }
@@ -273,136 +273,43 @@ h3 {
   font-weight: 850;
 }
 
-.heroVisual {
-  position: relative;
-  display: flex;
-  overflow: hidden;
+.heroMini {
+  display: grid;
+  align-content: center;
   min-height: 210px;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 22px;
+  padding: 24px;
   color: white;
 }
 
-.conceptCard {
+.heroMini.dark {
   border-radius: 28px 62px 28px 28px;
-  background:
-    linear-gradient(145deg, rgba(23, 23, 22, 0.12), rgba(23, 23, 22, 0.74)),
-    linear-gradient(135deg, #171716, #3d3730);
+  background: var(--ink);
 }
 
-.timelineCard {
+.heroMini.warm {
+  align-content: end;
+  gap: 18px;
   border-radius: 62px 28px 62px 28px;
-  background:
-    linear-gradient(145deg, rgba(162, 77, 24, 0.08), rgba(162, 77, 24, 0.72)),
-    linear-gradient(135deg, #ffb35c, #a24d18);
+  background: var(--brown);
 }
 
-.heroVisual strong {
-  position: relative;
-  z-index: 1;
-  font-size: 1.7rem;
-  line-height: 1;
-  font-weight: 950;
+.heroMini strong {
+  font-size: 4.6rem;
+  line-height: 0.9;
 }
 
-.miniBoard {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 9px;
-  width: 100%;
-}
-
-.miniBoard span {
-  display: block;
-  aspect-ratio: 9 / 14;
-  border-radius: 14px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.08)),
-    var(--mint);
-}
-
-.miniBoard span:nth-child(2) {
-  transform: translateY(14px);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.08)),
-    var(--orange);
-}
-
-.miniBoard span:nth-child(3) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.08)),
-    var(--sky);
-}
-
-.scriptLines {
-  display: grid;
-  gap: 8px;
-  margin-top: 22px;
-}
-
-.scriptLines i {
-  display: block;
-  height: 9px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.62);
-}
-
-.scriptLines i:nth-child(2) {
-  width: 76%;
-}
-
-.scriptLines i:nth-child(3) {
-  width: 48%;
-}
-
-.timelinePreview {
-  display: grid;
-  grid-template-columns: 0.9fr 1fr;
+.contactCard {
   gap: 10px;
 }
 
-.timelinePreview span {
-  display: block;
-  min-height: 82px;
-  border-radius: 18px;
-  background:
-    radial-gradient(circle at 50% 34%, rgba(255, 255, 255, 0.8) 0 12%, transparent 13%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.12));
+.contactCard strong {
+  font-size: 1.42rem;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
 }
 
-.timelinePreview span:nth-child(2) {
-  transform: translateY(22px);
-}
-
-.timelineBars {
-  display: grid;
-  gap: 8px;
-  margin-top: 30px;
-}
-
-.timelineBars i {
-  display: block;
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(23, 23, 22, 0.56);
-}
-
-.timelineBars i:nth-child(2) {
-  width: 82%;
-  margin-left: 18%;
-  background: rgba(255, 255, 255, 0.66);
-}
-
-.timelineBars i:nth-child(3) {
-  width: 64%;
-  background: rgba(23, 23, 22, 0.42);
-}
-
-.timelineBars i:nth-child(4) {
-  width: 44%;
-  margin-left: 36%;
-  background: rgba(255, 255, 255, 0.54);
+.contactCard svg {
+  color: white;
 }
 
 .categoryRail {
