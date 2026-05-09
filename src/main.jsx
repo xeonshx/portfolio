@@ -9,6 +9,7 @@ import {
   Play,
   Sparkles,
 } from 'lucide-react';
+import './styles.css';
 
 const categories = ['Video Editor', 'UGC Editor', 'Brand Ads', 'YouTube', 'VSL', 'AI Creative'];
 
