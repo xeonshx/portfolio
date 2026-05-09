@@ -151,18 +151,35 @@ function App() {
         <div className="heroBoard" aria-label="Portfolio summary">
           <div className="heroReel">
             <Play size={30} fill="currentColor" />
-            <span>Featured reel</span>
+            <span>Start here</span>
             <strong>Showreel</strong>
             <small>YouTube embed placeholder</small>
           </div>
-          <div className="heroMini dark contactCard">
-            <span>WhatsApp</span>
-            <strong>+60 17 870 8152</strong>
+          <div className="heroVisual conceptCard" aria-label="Concept planning visual">
+            <div className="miniBoard">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div className="scriptLines">
+              <i></i>
+              <i></i>
+              <i></i>
+            </div>
+            <strong>Hook map</strong>
           </div>
-          <div className="heroMini warm contactCard">
-            <Mail size={24} />
-            <span>Email</span>
-            <strong>shafinhaque123456@gmail.com</strong>
+          <div className="heroVisual timelineCard" aria-label="Editing timeline visual">
+            <div className="timelinePreview">
+              <span></span>
+              <span></span>
+            </div>
+            <div className="timelineBars">
+              <i></i>
+              <i></i>
+              <i></i>
+              <i></i>
+            </div>
+            <strong>Edit rhythm</strong>
           </div>
         </div>
       </section>
