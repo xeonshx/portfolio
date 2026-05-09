@@ -89,8 +89,8 @@ main {
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 0.94fr) minmax(360px, 0.86fr);
-  gap: 42px;
+  grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1fr);
+  gap: 34px;
   align-items: center;
   min-height: calc(88vh - 84px);
   width: min(1160px, calc(100% - 32px));
@@ -118,17 +118,12 @@ p {
 }
 
 h1 {
-  max-width: 720px;
+  max-width: 700px;
   margin-bottom: 22px;
-  font-size: clamp(3.4rem, 6.1vw, 6.7rem);
-  line-height: 0.98;
+  font-size: clamp(3.1rem, 5.7vw, 6rem);
+  line-height: 0.94;
   letter-spacing: 0;
   font-weight: 950;
-}
-
-h1 span {
-  color: var(--brown);
-  font-style: italic;
 }
 
 h2 {
@@ -220,9 +215,9 @@ h3 {
 
 .heroBoard {
   display: grid;
-  grid-template-columns: 1fr 0.8fr;
-  gap: 18px;
-  min-height: 500px;
+  grid-template-columns: 1.12fr 0.88fr;
+  gap: 16px;
+  min-height: 520px;
 }
 
 .heroReel,
@@ -236,7 +231,7 @@ h3 {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  min-height: 500px;
+  min-height: 520px;
   padding: 28px;
   border-radius: 46px 46px 18px 46px;
   background:
@@ -263,14 +258,20 @@ h3 {
 .heroReel strong {
   max-width: 280px;
   margin-top: 12px;
-  font-size: 2.45rem;
+  font-size: 3.25rem;
   line-height: 1;
+}
+
+.heroReel small {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.78);
+  font-weight: 850;
 }
 
 .heroMini {
   display: grid;
-  align-content: center;
-  min-height: 210px;
+  align-content: space-between;
+  min-height: 252px;
   padding: 24px;
   color: white;
 }
@@ -288,8 +289,68 @@ h3 {
 }
 
 .heroMini strong {
-  font-size: 4.6rem;
-  line-height: 0.9;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.motionCard {
+  gap: 18px;
+}
+
+.motionFrames {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.motionFrames span {
+  display: block;
+  aspect-ratio: 9 / 14;
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0.08)),
+    var(--mint);
+}
+
+.motionFrames span:nth-child(2) {
+  transform: translateY(18px);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.08)),
+    var(--orange);
+}
+
+.motionFrames span:nth-child(3) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0.08)),
+    var(--sky);
+}
+
+.timelineStrips {
+  display: grid;
+  gap: 10px;
+}
+
+.timelineStrips span {
+  display: block;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(23, 23, 22, 0.52);
+}
+
+.timelineStrips span:nth-child(2) {
+  width: 80%;
+  margin-left: 20%;
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.timelineStrips span:nth-child(3) {
+  width: 64%;
+}
+
+.timelineStrips span:nth-child(4) {
+  width: 48%;
+  margin-left: 34%;
+  background: rgba(255, 255, 255, 0.58);
 }
 
 .categoryRail {

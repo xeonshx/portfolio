@@ -126,15 +126,15 @@ function App() {
       <section id="top" className="hero">
         <div className="heroCopy">
           <p className="eyebrow">
-            <Sparkles size={18} /> Video Editor | UGC Editor | Brand Ads | YouTube | VSL
+            <Sparkles size={18} /> Video Editor | Motion-led Ads | UGC | VSL
           </p>
-          <h1>Hello, I am <span>Shafin!</span></h1>
-          <p className="lede">Scroll-stopping edits for brands, creators, and ads.</p>
+          <h1>Motion-led edits for ads that need to move fast.</h1>
+          <p className="lede">Showreels, UGC ads, launch cuts, VSLs, and scroll-ready brand content.</p>
           <div className="heroProof">
-            <span>UGC Ads</span>
-            <span>HYPE Ads</span>
-            <span>Voiceover</span>
-            <span>AI Creative</span>
+            <span>Hook-first</span>
+            <span>Caption clean</span>
+            <span>Rhythm cuts</span>
+            <span>Ad-ready</span>
           </div>
           <div className="heroActions">
             <a className="primaryBtn" href="https://wa.me/60178708152">
@@ -150,15 +150,25 @@ function App() {
           <div className="heroReel">
             <Play size={30} fill="currentColor" />
             <span>Featured reel</span>
-            <strong>Showreel placeholder</strong>
+            <strong>Showreel</strong>
+            <small>YouTube embed placeholder</small>
           </div>
-          <div className="heroMini dark">
-            <strong>5+</strong>
-            <span>Portfolio categories</span>
+          <div className="heroMini dark motionCard">
+            <div className="motionFrames">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <strong>Hook map</strong>
           </div>
-          <div className="heroMini warm">
-            <BadgeCheck size={24} />
-            <span>Hooks, pacing, captions, thumbnails</span>
+          <div className="heroMini warm motionCard">
+            <div className="timelineStrips">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <strong>Edit rhythm</strong>
           </div>
         </div>
       </section>
