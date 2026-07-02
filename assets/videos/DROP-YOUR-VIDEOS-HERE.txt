@@ -1,0 +1,14 @@
+HOW TO ADD YOUR VIDEOS
+======================
+
+Drop your video files (.mp4 / .mov) into the matching folder:
+
+  ugc/         -> UGC Ads
+  hype/        -> HYPE Ads & Animations
+  podcast-ai/  -> Podcast & AI Ads
+  vsl/         -> Video Sales Letters
+  voiceover/   -> Voiceover & Bilingual Ads
+
+Then tell Claude "videos are in" — they will be compressed for web
+and wired into the site automatically. Original files are never
+modified or deleted.
