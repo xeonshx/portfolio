@@ -114,7 +114,7 @@ body::after {
 }
 .chips { display: flex; gap: 5px; flex: 1; flex-wrap: wrap; justify-content: center; }
 .chip-clip {
-  position: relative; flex: 1 1 auto;
+  position: relative; flex: 1 1 auto; cursor: pointer;
   background: var(--card); border: 1px solid var(--line); border-radius: 6px;
   padding: 8px 10px;
   font-size: .62rem; font-weight: 700; letter-spacing: .14em;
@@ -149,19 +149,17 @@ body::after {
 .strip-track {
   display: flex; gap: 12px; width: max-content;
   animation: filmroll 40s linear infinite;
+  pointer-events: none; /* purely decorative, no interaction at all */
 }
-.filmstrip:hover .strip-track { animation-play-state: paused; }
 .strip-tile {
   width: clamp(130px, 16vw, 210px); aspect-ratio: 9/16;
   border-radius: 12px; overflow: hidden; background: var(--card);
-  border: 1px solid var(--line); cursor: pointer; position: relative;
-  transition: transform .18s;
+  border: 1px solid var(--line); position: relative;
 }
-.strip-tile:hover { transform: scale(1.04); }
-.strip-tile video { width: 100%; height: 100%; object-fit: cover; }
-.strip-tile.empty { display: grid; place-items: center; cursor: default; }
+.strip-tile img { width: 100%; height: 100%; object-fit: cover; }
+.strip-tile.empty { display: grid; place-items: center; }
 .strip-tile.empty p { color: var(--muted); font-size: .6rem; letter-spacing: .22em; text-align: center; }
-@keyframes filmroll { to { transform: translateX(-50%); } }
+@keyframes filmroll { to { transform: translateX(calc(-100% / var(--sets, 2))); } }
 
 /* ── Work blocks ── */
 .block { padding: 9vh 4vw 2vh; }
@@ -183,27 +181,64 @@ body::after {
   width: clamp(210px, 23vw, 265px);
   position: relative; aspect-ratio: 9/16;
   border-radius: 14px; overflow: hidden;
-  background: var(--card); cursor: pointer;
+  background: var(--card);
   border: 1px solid var(--line);
   opacity: 0; transform: translateY(24px);
   transition: opacity .5s ease, transform .5s ease;
 }
 .tile.in { opacity: 1; transform: none; }
 .tile video, .tile img { width: 100%; height: 100%; object-fit: cover; }
-.tile .hoverhint {
-  position: absolute; inset: 0; display: grid; place-items: center;
-  background: rgba(19,18,16,.25); opacity: 0; transition: opacity .2s;
-  font-size: .7rem; letter-spacing: .25em; font-weight: 700; color: #fff;
+/* Landscape clips (e.g. VSL) opt into 16:9 via "ratio":"16:9" in videos.json */
+.tile.wide { width: clamp(440px, 62vw, 760px); aspect-ratio: 16/9; }
+.ytwrap { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.ytwrap > div, .ytwrap iframe { width: 100%; height: 100%; }
+/* Thumbnail shown until playback is confirmed — masks both the black
+   loading gap and YouTube's branded title/channel card (only visible
+   before a video is actually playing). Fades out once it's really rolling. */
+.cover {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-size: cover; background-position: center; background-color: var(--card);
+  transition: opacity .4s ease;
 }
-.tile:hover .hoverhint { opacity: 1; }
+.tile.is-ready .cover { opacity: 0; }
 .tile .vcap {
-  position: absolute; left: 0; right: 0; bottom: 0;
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
   padding: 34px 12px 10px;
   background: linear-gradient(transparent, rgba(0,0,0,.72));
   color: #fff; font-size: .72rem; font-weight: 700; letter-spacing: .08em;
   display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
 }
 .tile .vcap small { font-weight: 500; color: rgba(255,255,255,.65); letter-spacing: .14em; font-size: .58rem; }
+
+/* Tile controls: play/pause shows on hover, mute/unmute always visible.
+   Icons are inline SVG set via JS (app.js ICONS) — no emoji, renders
+   identically across every OS/browser. */
+.ctl {
+  position: absolute; z-index: 2;
+  border: none; border-radius: 50%; cursor: pointer;
+  background: #131210; color: #fff; /* fully opaque: nothing behind can bleed through */
+  display: grid; place-items: center;
+  transition: opacity .18s, background .15s, transform .15s;
+}
+.ctl:hover { background: var(--accent); transform: scale(1.08); }
+.ctl-play {
+  inset: 0; margin: auto; width: 52px; height: 52px;
+  opacity: 0;
+}
+.tile:hover .ctl-play, .tile:focus-within .ctl-play { opacity: 1; }
+.ctl-mute {
+  top: 10px; right: 10px; width: 38px; height: 38px;
+  border: 1.5px solid rgba(255,255,255,.6);
+  box-shadow: 0 2px 12px rgba(0,0,0,.4);
+  opacity: 1;
+}
+/* Breathing accent ring while muted — the clearest nudge that sound
+   is one tap away, without adding a text label that clutters the tile. */
+.ctl-mute.is-muted { animation: mutePulse 2.4s ease-in-out infinite; }
+@keyframes mutePulse {
+  0%, 100% { box-shadow: 0 2px 12px rgba(0,0,0,.4), 0 0 0 0 rgba(232,72,10,.45); }
+  50% { box-shadow: 0 2px 12px rgba(0,0,0,.4), 0 0 0 7px rgba(232,72,10,0); }
+}
 .tile.empty {
   display: grid; place-items: center; cursor: default;
   border: 1px dashed var(--line); background: transparent;
@@ -217,18 +252,27 @@ body::after {
   margin-top: 8vh;
 }
 .clients-kicker { font-size: .72rem; letter-spacing: .32em; color: var(--muted); font-weight: 500; margin-bottom: 44px; }
-.logo-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 30px;
-  max-width: 980px; margin: 0 auto; align-items: center;
+
+/* Scrolling brand marquee — a long, looping line reads as "a lot of
+   brands" far better than a static grid ever could. Content in the HTML
+   is written out twice back-to-back; translateX(-50%) loops seamlessly. */
+.logo-marquee {
+  overflow: hidden;
+  margin-inline: -6vw; /* bleed to the section's full width */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
-.logo-grid span, .logo-grid img {
-  justify-self: center;
+.logo-track {
+  display: flex; align-items: center; gap: 56px; width: max-content;
+  animation: logoScroll 26s linear infinite;
 }
-.logo-grid span {
-  font-weight: 900; font-style: italic; font-size: clamp(.95rem, 2.2vw, 1.35rem);
-  letter-spacing: -.01em; opacity: .8;
+.logo-marquee:hover .logo-track { animation-play-state: paused; }
+.logo-track span {
+  font-weight: 900; font-style: italic; font-size: clamp(1.1rem, 2.6vw, 1.6rem);
+  letter-spacing: -.01em; opacity: .8; white-space: nowrap;
 }
-.logo-grid img { max-height: 54px; max-width: 150px; object-fit: contain; }
+.logo-track img { max-height: 54px; max-width: 150px; object-fit: contain; white-space: nowrap; }
+@keyframes logoScroll { to { transform: translateX(-50%); } }
 
 /* ── Build world ── */
 .block-sub {
@@ -371,21 +415,6 @@ body::after {
   font-size: .72rem; letter-spacing: .18em; color: var(--muted);
 }
 .outro-meta a:hover { color: var(--text); }
-
-/* ── Lightbox ── */
-.lightbox[hidden] { display: none; }
-.lightbox {
-  position: fixed; inset: 0; z-index: 90;
-  background: rgba(19,18,16,.93); backdrop-filter: blur(10px);
-  display: grid; place-items: center;
-}
-.lightbox video { max-height: 88svh; max-width: 92vw; border-radius: 12px; }
-.lb-close {
-  position: absolute; top: 20px; right: 24px;
-  background: none; border: 1px solid rgba(255,255,255,.3); color: #fff;
-  width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 1rem;
-}
-.lb-close:hover { background: var(--accent); border-color: var(--accent); }
 
 @media (max-width: 640px) {
   .grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }

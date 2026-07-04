@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Videos — SHAFIN</title>
+<style>
+  :root {
+    --bg: #f2efe7; --text: #131210; --muted: #8a857a; --accent: #e8480a; --line: rgba(19,18,16,.14); --card: #fff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, 'Archivo', system-ui, sans-serif;
+    padding: 30px 5vw 100px;
+  }
+  h1 { font-size: 1.6rem; font-weight: 900; font-style: italic; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: .85rem; margin: 0 0 28px; max-width: 640px; line-height: 1.6; }
+  .addbar {
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px; margin-bottom: 34px;
+  }
+  .addbar input, .addbar select {
+    font: inherit; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--bg);
+  }
+  .addbar input[type=text] { flex: 1; min-width: 240px; }
+  button {
+    font: inherit; font-weight: 700; cursor: pointer; border: none; border-radius: 8px;
+    padding: 10px 18px; background: var(--text); color: var(--bg); transition: background .15s;
+  }
+  button:hover { background: var(--accent); }
+  button.ghost { background: transparent; border: 1px solid var(--line); color: var(--text); padding: 6px 10px; font-size: .75rem; }
+  button.danger:hover { background: #c0392b; color: #fff; }
+  .sections { display: grid; gap: 26px; }
+  .section {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px;
+  }
+  .section h2 {
+    font-size: 1rem; font-weight: 900; font-style: italic; margin: 0 0 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section h2 .count { color: var(--muted); font-weight: 500; font-style: normal; font-size: .8rem; }
+  .cards { display: flex; flex-wrap: wrap; gap: 12px; }
+  .card {
+    width: 150px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+    background: var(--bg); cursor: grab; position: relative;
+  }
+  .card.dragging { opacity: .35; }
+  .card img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: var(--line); }
+  .card .id { font-size: .62rem; color: var(--muted); padding: 6px 8px 0; word-break: break-all; }
+  .card .row { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px 8px; gap: 4px; }
+  .card select { font-size: .62rem; padding: 3px 4px; flex: 1; }
+  .dropzone { min-height: 60px; border: 2px dashed transparent; border-radius: 10px; transition: border-color .15s, background .15s; }
+  .dropzone.over { border-color: var(--accent); background: rgba(232,72,10,.06); }
+  .empty-hint { color: var(--muted); font-size: .75rem; font-style: italic; padding: 10px; }
+  .savebar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--text); color: var(--bg); padding: 14px 5vw;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .savebar p { margin: 0; font-size: .78rem; color: rgba(242,239,231,.7); }
+  .savebar button { background: var(--accent); color: #fff; }
+  .savebar button:hover { background: #fff; color: var(--text); }
+</style>
+</head>
+<body>
+
+<h1>Video Manager</h1>
+<p class="sub">
+  Paste a YouTube link, pick a section, hit Add. Drag any thumbnail into a different section to move it, or use its dropdown. When you're happy, hit <b>Download videos.json</b> below, then drop that file into
+  <code>assets/videos.json</code> on <a href="https://github.com/xeonshx/portfolio" target="_blank">github.com/xeonshx/portfolio</a> (Add file → Upload files → it overwrites the old one). Site updates automatically. No code, no asking anyone.
+</p>
+
+<div class="addbar">
+  <input type="text" id="newUrl" placeholder="Paste a YouTube link or ID…">
+  <select id="newSection"></select>
+  <input type="text" id="newBrand" placeholder="Brand (optional)" style="width:140px">
+  <button onclick="addVideo()">+ Add</button>
+</div>
+
+<div class="sections" id="sections"></div>
+
+<div class="savebar">
+  <p id="status">Loaded from assets/videos.json</p>
+  <div style="display:flex; gap:10px;">
+    <button class="ghost" style="color:#f2efe7; border-color:rgba(242,239,231,.3)" onclick="reload()">Reload from file</button>
+    <button class="ghost" id="copyBtn" style="color:#f2efe7; border-color:rgba(242,239,231,.3)" onclick="copyJson()">Copy JSON</button>
+    <button onclick="downloadJson()">Download videos.json</button>
+  </div>
+</div>
+
+<script>
+const SECTIONS = [
+  { key: 'ugc', label: 'UGC ADS' },
+  { key: 'hype', label: 'HYPE & ANIMATION' },
+  { key: 'podcast-ai', label: 'AI ENGINEERED ADS' },
+  { key: 'vsl', label: 'VSL' },
+  { key: 'voiceover', label: 'PODCAST & BILINGUAL' },
+];
+
+let data = {};
+
+function extractId(input) {
+  const s = input.trim();
+  const patterns = [
+    /youtu\.be\/([a-zA-Z0-9_-]{6,})/,
+    /shorts\/([a-zA-Z0-9_-]{6,})/,
+    /[?&]v=([a-zA-Z0-9_-]{6,})/,
+    /embed\/([a-zA-Z0-9_-]{6,})/,
+  ];
+  for (const p of patterns) {
+    const m = s.match(p);
+    if (m) return m[1].split(/[?&]/)[0];
+  }
+  if (/^[a-zA-Z0-9_-]{6,}$/.test(s)) return s;
+  return null;
+}
+
+async function reload() {
+  try {
+    const res = await fetch('assets/videos.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    data = await res.json();
+    SECTIONS.forEach(s => { if (!Array.isArray(data[s.key])) data[s.key] = []; data[s.key] = data[s.key].filter(v => v.id); });
+    render();
+    document.getElementById('status').textContent = 'Loaded from assets/videos.json';
+  } catch (err) {
+    document.getElementById('sections').innerHTML = `
+      <div class="section" style="border-color:#e8480a">
+        <h2 style="color:#e8480a">Couldn't load your videos</h2>
+        <p style="color:var(--muted); font-size:.85rem; line-height:1.7; max-width:560px;">
+          This page needs to be opened through a web address (like <code>http://localhost:4310/manage.html</code>
+          or, once your site is live, <code>https://xeonshx.github.io/portfolio/manage.html</code>) — not by
+          double-clicking the file directly. Browsers block a double-clicked page from reading other files on
+          your computer for security, which is what just happened.
+        </p>
+      </div>`;
+    SECTIONS.forEach(s => { if (!data[s.key]) data[s.key] = []; });
+    document.getElementById('status').textContent = "Couldn't load assets/videos.json — see message above";
+  }
+}
+
+function render() {
+  const secDiv = document.getElementById('sections');
+  secDiv.innerHTML = '';
+  const sel = document.getElementById('newSection');
+  sel.innerHTML = SECTIONS.map(s => `<option value="${s.key}">${s.label}</option>`).join('');
+
+  SECTIONS.forEach(sec => {
+    const box = document.createElement('div');
+    box.className = 'section';
+    const list = data[sec.key] || [];
+    box.innerHTML = `<h2>${sec.label} <span class="count">${list.length} clip${list.length === 1 ? '' : 's'}</span></h2>
+      <div class="cards dropzone" data-key="${sec.key}">
+        ${list.length ? '' : '<p class="empty-hint">Drop a clip here, or add one above.</p>'}
+      </div>`;
+    const cardsEl = box.querySelector('.cards');
+    list.forEach((item, idx) => cardsEl.appendChild(makeCard(sec.key, item, idx, list.length)));
+    secDiv.appendChild(box);
+  });
+
+  // Drag & drop wiring
+  document.querySelectorAll('.dropzone').forEach(zone => {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('over');
+      const { fromKey, id } = JSON.parse(e.dataTransfer.getData('text/plain'));
+      moveVideo(fromKey, zone.dataset.key, id);
+    });
+  });
+}
+
+function makeCard(sectionKey, item, idx, total) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.draggable = true;
+  card.innerHTML = `
+    <img src="https://img.youtube.com/vi/${item.id}/mqdefault.jpg" alt="">
+    <div class="id">${item.id}</div>
+    <div class="row" style="padding-bottom:0">
+      <button class="ghost" ${idx === 0 ? 'disabled style="opacity:.3"' : ''} title="Move earlier">↑</button>
+      <button class="ghost" ${idx === total - 1 ? 'disabled style="opacity:.3"' : ''} title="Move later">↓</button>
+      <span style="flex:1; text-align:center; font-size:.62rem; color:var(--muted)">#${idx + 1}</span>
+    </div>
+    <div class="row">
+      <select>
+        ${SECTIONS.map(s => `<option value="${s.key}" ${s.key === sectionKey ? 'selected' : ''}>${s.label}</option>`).join('')}
+      </select>
+      <button class="ghost danger">✕</button>
+    </div>`;
+  const [upBtn, downBtn] = card.querySelectorAll('.row')[0].querySelectorAll('button');
+  upBtn.onclick = () => reorderVideo(sectionKey, idx, idx - 1);
+  downBtn.onclick = () => reorderVideo(sectionKey, idx, idx + 1);
+  card.querySelector('select').onchange = (e) => moveVideoTo(sectionKey, item.id, e.target.value);
+  card.querySelector('.danger').onclick = () => removeVideo(sectionKey, item.id);
+  card.addEventListener('dragstart', e => {
+    card.classList.add('dragging');
+    e.dataTransfer.setData('text/plain', JSON.stringify({ fromKey: sectionKey, id: item.id }));
+  });
+  card.addEventListener('dragend', () => card.classList.remove('dragging'));
+  return card;
+}
+
+function reorderVideo(sectionKey, fromIdx, toIdx) {
+  const list = data[sectionKey];
+  if (toIdx < 0 || toIdx >= list.length) return;
+  [list[fromIdx], list[toIdx]] = [list[toIdx], list[fromIdx]];
+  render();
+  flagUnsaved();
+}
+
+function moveVideoTo(fromKey, id, toKey) {
+  moveVideo(fromKey, toKey, id);
+}
+
+function moveVideo(fromKey, toKey, id) {
+  if (fromKey === toKey) return;
+  const item = data[fromKey].find(v => v.id === id);
+  if (!item) return;
+  data[fromKey] = data[fromKey].filter(v => v.id !== id);
+  data[toKey].push(item);
+  render();
+  flagUnsaved();
+}
+
+function removeVideo(sectionKey, id) {
+  if (!confirm('Remove this clip from the site?')) return;
+  data[sectionKey] = data[sectionKey].filter(v => v.id !== id);
+  render();
+  flagUnsaved();
+}
+
+function addVideo() {
+  const url = document.getElementById('newUrl').value;
+  const key = document.getElementById('newSection').value;
+  const brand = document.getElementById('newBrand').value.trim();
+  const id = extractId(url);
+  if (!id) { alert("Couldn't find a video ID in that — paste the full YouTube link."); return; }
+  data[key].push({ id, brand, format: '' });
+  document.getElementById('newUrl').value = '';
+  document.getElementById('newBrand').value = '';
+  render();
+  flagUnsaved();
+}
+
+function flagUnsaved() {
+  document.getElementById('status').textContent = 'Unsaved changes — download when ready';
+}
+
+function buildJsonText() {
+  const ordered = {};
+  SECTIONS.forEach(s => { ordered[s.key] = data[s.key].length ? data[s.key] : [{ id: '', brand: '', format: '' }]; });
+  return JSON.stringify(ordered, null, 2);
+}
+
+function downloadJson() {
+  const blob = new Blob([buildJsonText()], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'videos.json';
+  a.click();
+  document.getElementById('status').textContent = 'Downloaded — now upload it to assets/videos.json on GitHub';
+}
+
+function copyJson() {
+  const text = buildJsonText();
+  const done = () => {
+    const btn = document.getElementById('copyBtn');
+    const original = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    document.getElementById('status').textContent = 'Copied — paste it over the contents of assets/videos.json on GitHub';
+    setTimeout(() => { btn.textContent = original; }, 1800);
+  };
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+
+function fallbackCopy(text, done) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  done();
+}
+
+reload();
+</script>
+</body>
+</html>
