@@ -8,7 +8,7 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 body {
   background: var(--bg);
   color: var(--text);
@@ -101,20 +101,25 @@ body::after {
 
 /* Timeline tracks */
 .timeline {
-  width: min(680px, 88vw); margin-top: 4vh;
-  display: grid; gap: 8px;
+  width: min(680px, 88vw); max-width: 100%; margin-top: 4vh;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px;
   animation: rise .8s .2s cubic-bezier(.2,.8,.2,1) both;
 }
-.track { display: flex; align-items: center; gap: 10px; }
+/* min-width:0 throughout this chain is load-bearing: .chip-clip uses
+   white-space:nowrap, and flex items default to min-width:auto (refusing
+   to shrink below their content size). Without overriding that, the nowrap
+   text forces .chips/.track wider than the viewport instead of wrapping,
+   which pushes the whole page into horizontal scroll on mobile. */
+.track { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .track-label {
   flex: none; width: 30px; padding: 5px 0;
   border: 1px solid var(--line); border-radius: 5px;
   font-size: .58rem; font-weight: 700; letter-spacing: .1em;
   color: var(--muted); text-align: center;
 }
-.chips { display: flex; gap: 5px; flex: 1; flex-wrap: wrap; justify-content: center; }
+.chips { display: flex; gap: 5px; flex: 1; flex-wrap: wrap; justify-content: center; min-width: 0; }
 .chip-clip {
-  position: relative; flex: 1 1 auto; cursor: pointer;
+  position: relative; flex: 1 1 auto; min-width: 0; cursor: pointer;
   background: var(--card); border: 1px solid var(--line); border-radius: 6px;
   padding: 8px 10px;
   font-size: .62rem; font-weight: 700; letter-spacing: .14em;
