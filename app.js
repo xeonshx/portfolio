@@ -318,24 +318,43 @@ function scrollToChipTarget(mode, label) {
   el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// Fill the BUILD terminal's `ship <args>` line once — each arg is a
+// clickable span that jumps to the WHAT I SHIP block, mirroring the way
+// the EDIT chips scroll to their sections.
+function renderBuildStack() {
+  const stack = document.getElementById('buildStack');
+  if (!stack) return;
+  const args = MODES.build.roles.split('·').map(r => r.trim().toLowerCase());
+  stack.innerHTML = args.map(a => `<span class="arg">${a}</span>`).join(' ');
+  stack.querySelectorAll('.arg').forEach(a => {
+    a.onclick = () => document.getElementById('ship')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+
 function setMode(mode) {
+  document.documentElement.dataset.mode = mode; // drives .edit-only / .build-only gating
   document.querySelectorAll('.mtab').forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
   document.getElementById('world-edit').hidden = mode !== 'edit';
   document.getElementById('world-build').hidden = mode !== 'build';
   const pitch = document.getElementById('pitch');
   const roles = document.getElementById('rolesLine');
   pitch.innerHTML = MODES[mode].pitch;
-  roles.innerHTML = MODES[mode].roles.split('·')
-    .map(r => `<span class="chip-clip">${r.trim()}</span>`).join('');
-  roles.querySelectorAll('.chip-clip').forEach(chip => {
-    chip.onclick = () => scrollToChipTarget(mode, chip.textContent.trim());
-  });
+  // EDIT chips live in the video-timeline instrument; BUILD roles live in
+  // the terminal instead, so only repopulate the chips for EDIT.
+  if (mode === 'edit') {
+    roles.innerHTML = MODES.edit.roles.split('·')
+      .map(r => `<span class="chip-clip">${r.trim()}</span>`).join('');
+    roles.querySelectorAll('.chip-clip').forEach(chip => {
+      chip.onclick = () => scrollToChipTarget('edit', chip.textContent.trim());
+    });
+  }
   // retrigger the rise-in on the swapped text
   [pitch, roles].forEach(el => { el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap'); });
   if (location.hash !== '#' + mode) history.replaceState(null, '', '#' + mode);
   // pause any playing edit-world videos when leaving
   if (mode !== 'edit') Object.values(players).forEach(p => p?.pauseVideo?.());
 }
+renderBuildStack();
 document.querySelectorAll('.mtab').forEach(b => b.onclick = () => setMode(b.dataset.mode));
 setMode(location.hash === '#build' ? 'build' : 'edit');
 

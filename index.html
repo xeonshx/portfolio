@@ -22,15 +22,22 @@
   <button class="mtab" data-mode="build">BUILD</button>
 </nav>
 
-<!-- Intro (shared, text swaps per mode) -->
+<!-- Intro (shared name + CTA; the "instrument" between them swaps per mode:
+     a video-editor timeline for EDIT, a dev terminal for BUILD) -->
 <header class="intro">
-  <p class="timecode"><span class="rec">●</span> REC <span id="tc">00:00:00:00</span> · 4K 24FPS</p>
+  <!-- Kicker: EDIT gets the REC timecode; BUILD has none (goes straight to
+       the name), and the vertically-centered hero just recenters cleanly. -->
+  <p class="kicker edit-only"><span class="rec">●</span> REC <span id="tc">00:00:00:00</span> · 4K 24FPS</p>
+
   <div class="clip">
-    <div class="playhead"></div>
+    <div class="playhead edit-only"></div>
     <h1>SHAFIN<span class="accent">*</span></h1>
   </div>
+
   <p class="pitch" id="pitch">I cut ads that <em>sell.</em></p>
-  <div class="timeline">
+
+  <!-- EDIT instrument: video-editor timeline -->
+  <div class="timeline edit-only">
     <div class="track">
       <span class="track-label">V2</span>
       <div class="chips" id="rolesLine"></div>
@@ -42,6 +49,16 @@
       </svg>
     </div>
   </div>
+
+  <!-- BUILD instrument: dev terminal -->
+  <div class="terminal build-only" aria-hidden="true">
+    <div class="term-bar"><i></i><i></i><i></i><span>shafin — zsh</span></div>
+    <div class="term-body">
+      <p class="term-line"><span class="term-prompt">~/shafin $</span> ship <span class="term-args" id="buildStack"></span></p>
+      <p class="term-line term-ok">✓ deployed &middot; 100% uptime<span class="term-cursor"></span></p>
+    </div>
+  </div>
+
   <div class="intro-actions">
     <a class="hire" href="https://wa.me/60178708152" target="_blank" rel="noopener">HIRE ME ↗</a>
     <a class="mail" href="mailto:shafinhaque123456@gmail.com">shafinhaque123456@gmail.com</a>
