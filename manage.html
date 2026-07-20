@@ -51,7 +51,8 @@
   .card img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: var(--line); }
   .card .id { font-size: .62rem; color: var(--muted); padding: 6px 8px 0; word-break: break-all; }
   .card .row { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px 8px; gap: 4px; }
-  .card select { font-size: .62rem; padding: 3px 4px; flex: 1; }
+  .card select { font-size: .62rem; padding: 3px 4px; flex: 1; min-width: 0; }
+  .card .danger { flex: none; }
   .dropzone { min-height: 60px; border: 2px dashed transparent; border-radius: 10px; transition: border-color .15s, background .15s; }
   .dropzone.over { border-color: var(--accent); background: rgba(232,72,10,.06); }
   .empty-hint { color: var(--muted); font-size: .75rem; font-style: italic; padding: 10px; }
