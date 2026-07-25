@@ -190,32 +190,6 @@ const playIO = new IntersectionObserver(entries => {
 
 let tileSeq = 0;
 
-function makeVideoTile(item) {
-  const d = document.createElement('div');
-  d.className = item.ratio === '16:9' ? 'tile wide' : 'tile';
-  const embedId = `yt-${tileSeq++}`;
-  const cap = item.brand || item.title
-    ? `<div class="vcap"><span>${item.brand || item.title}</span>${item.format ? `<small>${item.format}</small>` : ''}</div>`
-    : '';
-  d.dataset.embed = embedId;
-  d.dataset.videoId = item.id;
-  d.dataset.gated = 'true'; // reel tiles only play while their section is on screen
-  d.innerHTML = `
-    <div class="ytwrap"><div id="${embedId}"></div></div>
-    <div class="cover"></div>
-    <button class="ctl ctl-play" aria-label="Play or pause"></button>
-    <button class="ctl ctl-mute is-muted" aria-label="Mute or unmute"></button>
-    ${cap}`;
-  setThumb(d.querySelector('.cover'), item.id, true);
-  wireControls(d, embedId);
-  // Player is created lazily (lifeIO) as the tile nears the viewport and
-  // destroyed once it's far away; playIO starts/pauses playback only
-  // while it's genuinely on screen.
-  lifeIO.observe(d);
-  playIO.observe(d);
-  return d;
-}
-
 function render() {
   reel.innerHTML = '';
   SECTIONS.forEach(sec => {
@@ -235,28 +209,34 @@ function render() {
         d.innerHTML = '<p>REEL<br>LOADING SOON</p>';
         grid.appendChild(d);
       }
-      s.appendChild(grid);
     } else {
-      // Landscape (16:9) clips never sit right mixed into a grid of
-      // vertical cards — same shape mismatch whether the tile is big or
-      // small. They get their own quiet sub-row instead: a small kicker
-      // label, not a loud "FEATURED" banner, just enough to read as an
-      // intentional aside rather than a leftover that didn't fit.
-      const verticals = sec.videos.filter(v => v.ratio !== '16:9');
-      const wides = sec.videos.filter(v => v.ratio === '16:9');
-      verticals.forEach(item => grid.appendChild(makeVideoTile(item)));
-      s.appendChild(grid);
-      if (wides.length) {
-        const motion = document.createElement('div');
-        motion.className = 'motion-block';
-        motion.innerHTML = '<p class="motion-kicker">+ motion graphics</p>';
-        const row = document.createElement('div');
-        row.className = 'motion-row';
-        wides.forEach(item => row.appendChild(makeVideoTile(item)));
-        motion.appendChild(row);
-        s.appendChild(motion);
-      }
+      sec.videos.forEach(item => {
+        const d = document.createElement('div');
+        d.className = item.ratio === '16:9' ? 'tile wide' : 'tile';
+        const embedId = `yt-${tileSeq++}`;
+        const cap = item.brand || item.title
+          ? `<div class="vcap"><span>${item.brand || item.title}</span>${item.format ? `<small>${item.format}</small>` : ''}</div>`
+          : '';
+        d.dataset.embed = embedId;
+        d.dataset.videoId = item.id;
+        d.dataset.gated = 'true'; // reel tiles only play while their section is on screen
+        d.innerHTML = `
+          <div class="ytwrap"><div id="${embedId}"></div></div>
+          <div class="cover"></div>
+          <button class="ctl ctl-play" aria-label="Play or pause"></button>
+          <button class="ctl ctl-mute is-muted" aria-label="Mute or unmute"></button>
+          ${cap}`;
+        setThumb(d.querySelector('.cover'), item.id, true);
+        wireControls(d, embedId);
+        // Player is created lazily (lifeIO) as the tile nears the viewport
+        // and destroyed once it's far away; playIO starts/pauses playback
+        // only while it's genuinely on screen.
+        lifeIO.observe(d);
+        playIO.observe(d);
+        grid.appendChild(d);
+      });
     }
+    s.appendChild(grid);
     reel.appendChild(s);
   });
 }
@@ -376,7 +356,6 @@ function setMode(mode) {
 }
 renderBuildStack();
 document.querySelectorAll('.mtab').forEach(b => b.onclick = () => setMode(b.dataset.mode));
-
 setMode(location.hash === '#build' ? 'build' : 'edit');
 
 // Running timecode in the hero (24fps)

@@ -93,7 +93,7 @@ body::after {
 :root[data-mode="build"] .edit-only { display: none; }
 
 /* Clip with sweeping playhead over the name */
-.clip { position: relative; display: inline-block; isolation: isolate; }
+.clip { position: relative; display: inline-block; }
 .playhead {
   position: absolute; top: -18px; bottom: -14px; left: 0; width: 2px;
   background: var(--accent); z-index: 2; pointer-events: none;
@@ -104,63 +104,9 @@ body::after {
   border: 6px solid transparent; border-top: 9px solid var(--accent);
 }
 @keyframes sweep { from { left: -2%; } to { left: 101%; } }
-.star-edit {
-  position: absolute;
-  right: clamp(-54px, -3.8vw, -28px);
-  top: clamp(-30px, -1.5vw, -10px);
-  z-index: 4;
-  width: clamp(112px, 12vw, 140px);
-  aspect-ratio: 140 / 106;
-  pointer-events: none;
-}
-.star-edit svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.star-edge,
-.star-guide {
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.star-edge {
-  stroke: var(--bg);
-  stroke-width: 1.7;
-  filter: drop-shadow(0 2px 4px rgba(19,18,16,.2));
-}
-.star-guide {
-  stroke: #d0a81f;
-  stroke-width: 1;
-}
-.star-node {
-  fill: var(--bg);
-  stroke: var(--accent);
-  stroke-width: 1.3;
-}
-.star-node.handle {
-  fill: #d0a81f;
-  stroke: rgba(19,18,16,.42);
-}
-.star-key {
-  fill: var(--accent);
-  stroke: var(--bg);
-  stroke-width: 1;
-  transform-box: fill-box;
-  transform-origin: center;
-  transform: rotate(45deg);
-}
-.pen-cursor {
-  fill: var(--text);
-  stroke: var(--bg);
-  stroke-width: 1.2;
-  filter: drop-shadow(0 5px 7px rgba(19,18,16,.16));
-}
 
 /* Timeline tracks */
 .timeline {
-  position: relative;
   width: min(680px, 88vw); max-width: 100%; margin-top: 4vh;
   display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px;
   animation: rise .8s .2s cubic-bezier(.2,.8,.2,1) both;
@@ -296,19 +242,8 @@ body::after {
 }
 .tile.in { opacity: 1; transform: none; }
 .tile video, .tile img { width: 100%; height: 100%; object-fit: cover; }
-/* Landscape clips (e.g. VSL) opt into 16:9 via "ratio":"16:9" in videos.json. */
-.tile.wide { width: clamp(320px, 62vw, 620px); aspect-ratio: 16/9; }
-
-/* Motion-graphics sub-row: any 16:9 clip in a section that otherwise has
-   vertical cards never sits right mixed into that grid (shape mismatch,
-   whether the tile is small or large) — so it gets its own quiet row
-   instead, introduced by a small kicker, not a loud "FEATURED" banner. */
-.motion-block { margin-top: 3vh; text-align: center; }
-.motion-kicker {
-  font-size: .68rem; letter-spacing: .2em; font-weight: 700; font-style: italic;
-  color: var(--muted); margin-bottom: 14px;
-}
-.motion-row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+/* Landscape clips (e.g. VSL) opt into 16:9 via "ratio":"16:9" in videos.json */
+.tile.wide { width: clamp(440px, 62vw, 760px); aspect-ratio: 16/9; }
 .ytwrap { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
 .ytwrap > div, .ytwrap iframe { width: 100%; height: 100%; }
 /* Thumbnail shown until playback is confirmed — masks both the black
