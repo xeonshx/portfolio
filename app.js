@@ -8,6 +8,9 @@
 const SECTIONS = [
   { key: 'ugc', num: '01', title: 'UGC ADS', videos: [] },
   { key: 'hype', num: '02', title: 'HYPE & ANIMATION', videos: [] },
+  { key: 'saas', title: 'SAAS ANIMATION ASSETS',
+    sub: 'Product demos, feature reveals and launch animations for software companies.',
+    videos: [] },
   { key: 'podcast-ai', num: '03', title: 'AI ENGINEERED ADS', videos: [] },
   { key: 'vsl', num: '04', title: 'VSL', videos: [] },
   { key: 'voiceover', num: '05', title: 'PODCAST & BILINGUAL',
@@ -193,8 +196,12 @@ let tileSeq = 0;
 function render() {
   reel.innerHTML = '';
   SECTIONS.forEach(sec => {
+    // A section with no clips yet (e.g. a brand-new one) stays hidden
+    // instead of showing "loading soon" placeholders on the live site.
+    if (!sec.videos.length) return;
     const s = document.createElement('section');
     s.className = 'block';
+    s.dataset.key = sec.key;
     s.innerHTML = `
       <div class="block-head">
         <h2 class="block-title">${sec.title}</h2>
@@ -287,6 +294,8 @@ async function loadVideos() {
   loadYouTubeApi();
   render();
   renderStrip();
+  renderIndex();
+  kineticAll();
 }
 
 // ── EDIT / BUILD mode tabs ──
@@ -314,7 +323,7 @@ function scrollToChipTarget(mode, label) {
   if (!target) return;
   const el = target.startsWith('#')
     ? document.querySelector(target)
-    : document.querySelectorAll('#reel .block')[SECTIONS.findIndex(s => s.key === target)];
+    : document.querySelector(`#reel .block[data-key="${target}"]`);
   el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -333,23 +342,13 @@ function renderBuildStack() {
 
 function setMode(mode) {
   document.documentElement.dataset.mode = mode; // drives .edit-only / .build-only gating
-  document.querySelectorAll('.mtab').forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
+  document.querySelectorAll('.mtab, .bnav-mode').forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
   document.getElementById('world-edit').hidden = mode !== 'edit';
   document.getElementById('world-build').hidden = mode !== 'build';
   const pitch = document.getElementById('pitch');
-  const roles = document.getElementById('rolesLine');
   pitch.innerHTML = MODES[mode].pitch;
-  // EDIT chips live in the video-timeline instrument; BUILD roles live in
-  // the terminal instead, so only repopulate the chips for EDIT.
-  if (mode === 'edit') {
-    roles.innerHTML = MODES.edit.roles.split('·')
-      .map(r => `<span class="chip-clip">${r.trim()}</span>`).join('');
-    roles.querySelectorAll('.chip-clip').forEach(chip => {
-      chip.onclick = () => scrollToChipTarget('edit', chip.textContent.trim());
-    });
-  }
   // retrigger the rise-in on the swapped text
-  [pitch, roles].forEach(el => { el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap'); });
+  pitch.classList.remove('swap'); void pitch.offsetWidth; pitch.classList.add('swap');
   if (location.hash !== '#' + mode) history.replaceState(null, '', '#' + mode);
   // pause any playing edit-world videos when leaving
   if (mode !== 'edit') Object.values(players).forEach(p => p?.pauseVideo?.());
@@ -358,16 +357,155 @@ renderBuildStack();
 document.querySelectorAll('.mtab').forEach(b => b.onclick = () => setMode(b.dataset.mode));
 setMode(location.hash === '#build' ? 'build' : 'edit');
 
-// Running timecode in the hero (24fps)
-const tcEl = document.getElementById('tc');
-let frames = 0;
-setInterval(() => {
-  frames++;
-  const f = frames % 24, s = Math.floor(frames / 24) % 60,
-        m = Math.floor(frames / 1440) % 60, h = Math.floor(frames / 86400);
-  const p = n => String(n).padStart(2, '0');
-  tcEl.textContent = `${p(h)}:${p(m)}:${p(s)}:${p(f)}`;
-}, 1000 / 24);
+// ── Services index ──
+// Big italic rows, one per service. Hovering a row brings up a frame of
+// that work which trails the cursor with ease-out lag and tilts with the
+// cursor's speed, pivoting on an After Effects style anchor point. Touch
+// screens get a small thumbnail on each row instead. Every row jumps to
+// its section.
+const EXTRA_ROWS = [
+  { title: 'SOCIAL MEDIA', target: '.socialops', img: 'assets/img/social-tiktok.png', meta: 'TikTok + Meta' },
+  { title: 'AI COACHING', target: '#coaching', img: 'assets/img/coaching-bg.jpg', meta: '1:1 live' },
+];
+let indexReady = false;
+
+function renderIndex() {
+  const list = document.getElementById('indexList');
+  if (!list) return;
+  const rows = SECTIONS.filter(s => s.videos.length).map(s => ({
+    title: s.title,
+    target: `#reel .block[data-key="${s.key}"]`,
+    videoId: s.videos[0].id,
+    wide: s.videos[0].ratio === '16:9',
+    meta: `${s.videos.length} ${s.videos.length === 1 ? 'clip' : 'clips'}`,
+  })).concat(EXTRA_ROWS);
+
+  list.innerHTML = '';
+  rows.forEach(r => {
+    const li = document.createElement('li');
+    li.className = 'ix-row';
+    li.innerHTML = `<a href="#"><span class="ix-name"></span><span class="ix-meta"></span><img class="ix-thumb" alt=""></a>`;
+    li.querySelector('.ix-name').textContent = r.title;
+    li.querySelector('.ix-meta').textContent = r.meta;
+    const thumb = li.querySelector('.ix-thumb');
+    if (r.videoId) setThumb(thumb, r.videoId, false); else thumb.src = r.img;
+    li.querySelector('a').onclick = e => {
+      e.preventDefault();
+      document.querySelector(r.target)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    li.dataset.wide = r.wide ? '1' : '';
+    list.appendChild(li);
+  });
+  if (!indexReady) { indexReady = true; initIndexFloat(); }
+}
+
+function initIndexFloat() {
+  const list = document.getElementById('indexList');
+  const float = document.getElementById('indexFloat');
+  const img = document.getElementById('indexImg');
+  if (!list || !float || !matchMedia('(hover: hover)').matches) return;
+  // #world-edit animates a transform on load, and a transformed ancestor
+  // turns position:fixed into "fixed to that ancestor", so the frame would
+  // land far from the cursor. Living on <body> keeps it viewport-fixed.
+  document.body.appendChild(float);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let x = 0, y = 0, tx = 0, ty = 0, rot = 0, raf = null, on = false;
+
+  function tick() {
+    const k = reduce ? 1 : 0.13;             // ease-out follow
+    const vx = (tx - x) * k;
+    x += vx; y += (ty - y) * k;
+    rot += (Math.max(-9, Math.min(9, vx * 0.35)) - rot) * 0.12; // tilt from speed
+    float.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${rot}deg)`;
+    if (on || Math.abs(tx - x) > 0.3 || Math.abs(rot) > 0.05) raf = requestAnimationFrame(tick);
+    else raf = null;
+  }
+  const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
+
+  list.addEventListener('pointermove', e => {
+    tx = e.clientX; ty = e.clientY;
+    if (!on) { on = true; x = tx; y = ty; }
+    kick();
+  });
+  list.addEventListener('pointerover', e => {
+    const row = e.target.closest('.ix-row');
+    if (!row) return;
+    list.querySelectorAll('.ix-row').forEach(r => r.classList.toggle('hot', r === row));
+    list.classList.add('hovering');
+    const src = row.querySelector('.ix-thumb').src;
+    if (src && img.src !== src) img.src = src;
+    float.classList.toggle('wide', row.dataset.wide === '1');
+    float.classList.add('show');
+  });
+  list.addEventListener('pointerleave', () => {
+    on = false;
+    list.classList.remove('hovering');
+    list.querySelectorAll('.ix-row').forEach(r => r.classList.remove('hot'));
+    float.classList.remove('show');
+    kick();
+  });
+}
+
+// ── Kinetic titles ──
+// Section titles cut in letter by letter as they scroll into view, each
+// letter rising out of its own word mask on an expo ease, the way an AE
+// text animator with a stagger offset builds a title.
+const titleIO = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('kin-in');
+    titleIO.unobserve(e.target);
+  });
+}, { threshold: 0.4 });
+
+function kinetic(el) {
+  if (!el || el.dataset.kin) return;
+  el.dataset.kin = '1';
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let i = 0;
+  const walk = node => {
+    [...node.childNodes].forEach(child => {
+      if (child.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        child.textContent.split(/(\s+)/).forEach(part => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); return; }
+          const word = document.createElement('span');
+          word.className = 'kin-w';
+          [...part].forEach(ch => {
+            const l = document.createElement('span');
+            l.className = 'kin-l';
+            l.style.setProperty('--i', i++);
+            l.textContent = ch;
+            word.appendChild(l);
+          });
+          frag.appendChild(word);
+        });
+        child.replaceWith(frag);
+      } else if (child.nodeType === 1) {
+        walk(child);
+      }
+    });
+  };
+  walk(el);
+  el.classList.add('kin');
+  titleIO.observe(el);
+}
+
+function kineticAll() {
+  document.querySelectorAll('.block-title, .coaching h2').forEach(kinetic);
+}
+
+// ── Mobile bottom bar ── appears once the top tabs have scrolled away
+(() => {
+  const bnav = document.getElementById('bnav');
+  const tabs = document.querySelector('.mode-tabs');
+  if (!bnav || !tabs) return;
+  bnav.querySelectorAll('.bnav-mode').forEach(b => {
+    b.onclick = () => { setMode(b.dataset.mode); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  });
+  new IntersectionObserver(([e]) => bnav.classList.toggle('show', !e.isIntersecting)).observe(tabs);
+})();
 
 loadVideos();
 document.getElementById('year').textContent = new Date().getFullYear();
