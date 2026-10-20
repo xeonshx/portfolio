@@ -35,14 +35,14 @@ body::after {
 /* ── Mode tabs ── */
 .mode-tabs {
   display: flex; justify-content: center;
-  padding-top: 26px;
+  padding-top: clamp(26px, 9vh, 96px);
 }
 .mtab {
   cursor: pointer; border: 1px solid var(--line);
   background: transparent;
   color: var(--muted);
-  font: 700 .8rem 'Archivo', sans-serif; font-style: italic; letter-spacing: .14em;
-  padding: 11px 30px;
+  font: 900 1.05rem 'Archivo', sans-serif; font-style: italic; letter-spacing: .14em;
+  padding: 15px 48px;
   transition: color .18s, background .18s;
 }
 .mtab:first-child { border-radius: 999px 0 0 999px; border-right: none; }
@@ -54,7 +54,7 @@ body::after {
 .intro {
   min-height: 58svh;
   display: flex; flex-direction: column; justify-content: center; align-items: center;
-  text-align: center; padding: 7vh 4vw 5vh;
+  text-align: center; padding: 4vh 4vw 5vh;
   position: relative;
 }
 .intro::before {
