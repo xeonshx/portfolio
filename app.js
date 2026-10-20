@@ -9,7 +9,7 @@ const SECTIONS = [
   { key: 'ugc', num: '01', title: 'UGC ADS', videos: [] },
   { key: 'hype', num: '02', title: 'HYPE & ANIMATION', videos: [] },
   { key: 'saas', title: 'SAAS ANIMATION ASSETS',
-    sub: 'Product demos, feature reveals and launch animations for software companies.',
+    sub: 'SaaS = Software as a Service. Launch videos and product demos for software companies, cut for X threads.',
     videos: [] },
   { key: 'podcast-ai', num: '03', title: 'AI ENGINEERED ADS', videos: [] },
   { key: 'vsl', num: '04', title: 'VSL', videos: [] },

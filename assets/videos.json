@@ -49,8 +49,27 @@
       "ratio": "16:9"
     }
   ],
-  "saas": [],
+  "saas": [
+    {
+      "id": "nB46K26RrKA",
+      "brand": "WithCoverage",
+      "format": "SaaS launch, X thread",
+      "ratio": "16:9"
+    },
+    {
+      "id": "E8BXRrom2F4",
+      "brand": "Notch",
+      "format": "SaaS launch, X thread",
+      "ratio": "16:9"
+    }
+  ],
   "podcast-ai": [
+    {
+      "id": "ABuMko0tJOg",
+      "brand": "AGI Meme",
+      "format": "AI generated",
+      "ratio": "16:9"
+    },
     {
       "id": "e9O_dajXcro",
       "brand": "",
