@@ -10,7 +10,7 @@ const SECTIONS = [
   { key: 'hype', num: '02', title: 'HYPE & ANIMATION', videos: [] },
   { key: 'podcast-ai', num: '03', title: 'AI ENGINEERED ADS', videos: [] },
   { key: 'saas', title: 'SAAS ANIMATION ASSETS',
-    sub: 'Launch films for software products, built to stop the scroll on X.',
+    sub: 'SaaS launch videos, X thread animations and animated product demos.',
     videos: [] },
   { key: 'vsl', num: '04', title: 'VSL', videos: [] },
   { key: 'voiceover', num: '05', title: 'PODCAST & BILINGUAL',
