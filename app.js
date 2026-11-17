@@ -240,6 +240,26 @@ function render() {
         // only while it's genuinely on screen.
         lifeIO.observe(d);
         playIO.observe(d);
+        if (item.trend) {
+          // A clip that went viral gets its own row: the video big, with
+          // the real proof (X's trending story it led) beside it.
+          const t = item.trend;
+          const row = document.createElement('div');
+          row.className = 'trend';
+          row.appendChild(d);
+          const proof = document.createElement('a');
+          proof.className = 'trend-proof';
+          proof.href = t.url; proof.target = '_blank'; proof.rel = 'noopener';
+          proof.innerHTML = `
+            <p class="tp-kick"><i></i>Went viral on X</p>
+            <p class="tp-num">${t.views}</p>
+            <p class="tp-label">views on one repost before it was taken down</p>
+            <img src="${t.img}" alt="X trending story: AI Clips Revive The Office with Michael Scott Hiring Jensen Huang" loading="lazy">
+            <p class="tp-note">X built a trending story around it. That three and a half minute clip it leads with is this one. <b>See it on X ↗</b></p>`;
+          row.appendChild(proof);
+          s.appendChild(row);
+          return;
+        }
         grid.appendChild(d);
       });
     }

@@ -65,6 +65,17 @@
   ],
   "podcast-ai": [
     {
+      "id": "vqHZruDSHw0",
+      "brand": "Michael Scott hires Jensen Huang",
+      "format": "AI generated",
+      "ratio": "16:9",
+      "trend": {
+        "views": "200K+",
+        "url": "https://x.com/i/trending/2122455967807701190",
+        "img": "assets/img/x-trend.jpg"
+      }
+    },
+    {
       "id": "ABuMko0tJOg",
       "brand": "AGI Meme",
       "format": "AI generated",
