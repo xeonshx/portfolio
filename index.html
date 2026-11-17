@@ -15,11 +15,16 @@
 <!-- ?v= must be bumped on every deploy that changes CSS/JS. GitHub Pages
      caches assets for ~10 min, so new HTML can otherwise arrive with old
      CSS (that mismatch is what blew the graph editor up full-page once). -->
-<link rel="stylesheet" href="styles.css?v=22">
+<link rel="stylesheet" href="styles.css?v=27">
 </head>
 <body>
 
 <!-- Mode tabs -->
+<a class="xbar edit-only" href="#" id="xbar">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.8L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z"/></svg>
+  <span>Trending on X, Nov 17</span><b>My AI Office clip hit 200K+ views</b><u>Watch it</u>
+</a>
+<nav class="rail" id="rail" aria-label="Jump to section"></nav>
 <nav class="mode-tabs" aria-label="Site mode">
   <button class="mtab on" data-mode="edit">EDIT</button>
   <button class="mtab" data-mode="build">BUILD</button>
@@ -31,9 +36,9 @@
   <div class="clip">
     <div class="playhead edit-only"></div>
     <h1>SHAFIN<span class="accent">*</span></h1>
-    <!-- AE-style layer selection on the name: bounding box, handles and
-         the anchor point, as if the text layer is mid-adjustment. -->
-    <span class="sel" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><b class="sel-anchor"></b></span>
+    <!-- BUILD: Figma-style layer selection on the name. EDIT: app.js turns
+         the name into a clip that the playhead and a razor cut up. -->
+    <span class="sel build-only" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><b class="sel-anchor"></b></span>
   </div>
 
   <p class="pitch" id="pitch">I cut ads that <em>sell.</em></p>
@@ -199,6 +204,6 @@
   <a class="bnav-hire" href="https://wa.me/60178708152" target="_blank" rel="noopener">HIRE ME ↗</a>
 </nav>
 
-<script src="app.js?v=21"></script>
+<script src="app.js?v=27"></script>
 </body>
 </html>

@@ -256,11 +256,13 @@ function render() {
           chip.href = t.url; chip.target = '_blank'; chip.rel = 'noopener';
           chip.innerHTML = `${X}<b>Trending</b><span>${t.views} views</span>`;
           d.appendChild(chip);
-          const rec = document.createElement('a');
-          rec.className = 'trend-receipt';
-          rec.href = t.url; rec.target = '_blank'; rec.rel = 'noopener';
-          rec.innerHTML = `<q>${t.headline}</q><small>X Trending, ${t.date} ↗</small>`;
-          row.appendChild(rec);
+          const ban = document.createElement('a');
+          ban.className = 'x-banner';
+          ban.href = t.url; ban.target = '_blank'; ban.rel = 'noopener';
+          ban.innerHTML = `${X}<span class="xb-tag">Trending on X</span><span class="xb-date">${t.date}</span>
+            <span class="xb-head">“${t.headline}”</span>
+            <span class="xb-views">${t.views}<small>views</small></span><span class="xb-go">See it on X ↗</span>`;
+          row.insertBefore(ban, d);
           s.appendChild(row);
           return;
         }
@@ -319,6 +321,7 @@ async function loadVideos() {
   render();
   renderStrip();
   renderIndex();
+  buildRail();
   kineticAll();
 }
 
@@ -376,6 +379,7 @@ function setMode(mode) {
   if (location.hash !== '#' + mode) history.replaceState(null, '', '#' + mode);
   // pause any playing edit-world videos when leaving
   if (mode !== 'edit') Object.values(players).forEach(p => p?.pauseVideo?.());
+  if (typeof buildRail === 'function') buildRail();
 }
 renderBuildStack();
 document.querySelectorAll('.mtab').forEach(b => b.onclick = () => setMode(b.dataset.mode));
@@ -402,6 +406,7 @@ function renderIndex() {
     videoId: s.videos[0].id,
     wide: s.videos[0].ratio === '16:9',
     meta: `${s.videos.length} ${s.videos.length === 1 ? 'clip' : 'clips'}`,
+    trend: s.videos.some(v => v.trend),
   })).concat(EXTRA_ROWS);
 
   list.innerHTML = '';
@@ -411,6 +416,8 @@ function renderIndex() {
     li.innerHTML = `<a href="#"><span class="ix-name"></span><span class="ix-meta"></span><img class="ix-thumb" alt=""></a>`;
     li.querySelector('.ix-name').textContent = r.title;
     li.querySelector('.ix-meta').textContent = r.meta;
+    if (r.trend) li.querySelector('.ix-meta').insertAdjacentHTML('afterbegin',
+      '<span class="ix-trend"><svg viewBox="0 0 24 24"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.8L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z"/></svg>Trending</span>');
     const thumb = li.querySelector('.ix-thumb');
     if (r.videoId) setThumb(thumb, r.videoId, false); else thumb.src = r.img;
     li.querySelector('a').onclick = e => {
@@ -516,9 +523,7 @@ function kinetic(el) {
   titleIO.observe(el);
 }
 
-function kineticAll() {
-  document.querySelectorAll('.block-title, .coaching h2').forEach(kinetic);
-}
+function kineticAll() {} // letter-by-letter headline reveal removed: titles just sit there
 
 // ── Mobile bottom bar ── appears once the top tabs have scrolled away
 (() => {
@@ -533,3 +538,110 @@ function kineticAll() {
 
 loadVideos();
 document.getElementById('year').textContent = new Date().getFullYear();
+
+// ── Announcement bar: jumps to the viral clip ──
+document.getElementById('xbar')?.addEventListener('click', e => {
+  e.preventDefault();
+  document.querySelector('.trend')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+// ── Quick-scroll rail ──
+// One line per section of the current mode, like a chat's jump list.
+// The section in view gets the long line; hover shows names.
+function buildRail() {
+  const rail = document.getElementById('rail');
+  if (!rail) return;
+  const mode = document.documentElement.dataset.mode || 'edit';
+  const name = el => (el.querySelector('h2')?.textContent || '').replace(/[.*]/g, '').trim();
+  const cap = t => t.toLowerCase().replace(/(^|\s)\S/g, m => m.toUpperCase())
+    .replace(/\b(Ugc|Ai|Vsl)\b/g, w => w.toUpperCase()).replace(/\bSaas\b/g, 'SaaS');
+  const items = [{ el: document.querySelector('.intro'), label: 'Top' }];
+  if (mode === 'edit') {
+    items.push({ el: document.getElementById('index'), label: 'Services' });
+    document.querySelectorAll('#reel .block').forEach(b => items.push({ el: b, label: cap(name(b)) }));
+    const so = document.querySelector('.socialops'); if (so) items.push({ el: so, label: 'Social Media' });
+    const co = document.getElementById('coaching'); if (co) items.push({ el: co, label: 'AI Coaching' });
+  } else {
+    document.querySelectorAll('.case3').forEach(c => items.push({ el: c, label: c.querySelector('.c-title')?.textContent || 'Build' }));
+    const sh = document.getElementById('ship'); if (sh) items.push({ el: sh, label: cap(name(sh)) || 'What I Ship' });
+  }
+  const ct = document.getElementById('contact'); if (ct) items.push({ el: ct, label: 'Contact' });
+  rail.innerHTML = '';
+  items.filter(i => i.el).forEach(i => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = '<i></i><span></span>';
+    b.querySelector('span').textContent = i.label;
+    b.onclick = () => i.el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    b._el = i.el;
+    rail.appendChild(b);
+  });
+  railSync();
+}
+function railSync() {
+  const btns = [...document.querySelectorAll('#rail button')];
+  let on = btns[0];
+  const line = innerHeight * 0.4;
+  btns.forEach(b => { if (b._el.getBoundingClientRect().top <= line) on = b; });
+  btns.forEach(b => b.classList.toggle('on', b === on));
+}
+let railTick = false;
+addEventListener('scroll', () => {
+  if (railTick) return;
+  railTick = true;
+  requestAnimationFrame(() => { railTick = false; railSync(); });
+}, { passive: true });
+
+// ── EDIT hero: the cursor cuts the dead air out of the name ──
+// The name starts as a bad take, "SHA uh FIN". A Figma-style cursor razors
+// both sides of the "uh", selects it, deletes it, and the clip ripples shut.
+// Then the playhead plays the clean take through. Click the name to replay.
+(() => {
+  const clip = document.querySelector('.intro .clip');
+  const h1 = clip?.querySelector('h1');
+  const ph = clip?.querySelector('.playhead');
+  if (!h1 || !ph) return;
+  h1.setAttribute('aria-label', 'SHAFIN');
+  const accent = h1.querySelector('.accent');
+  h1.innerHTML = '<span class="rl">SHA</span><span class="rl filler"><span>uh</span></span><span class="rl rest">FIN</span>';
+  h1.appendChild(accent);
+  const filler = h1.querySelector('.filler'), rest = h1.querySelector('.rest');
+  const cur = document.createElement('span');
+  cur.className = 'razor';
+  cur.setAttribute('aria-hidden', 'true');
+  cur.innerHTML = '<svg viewBox="0 0 16 20"><path d="M1 1l13 7.2-5.6 1.6L6 16z" fill="#e8480a" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg><em>Shafin</em><kbd>Delete</kbd>';
+  clip.appendChild(cur);
+  clip.classList.add('razor-on');
+
+  const X = el => el.getBoundingClientRect().left - clip.getBoundingClientRect().left;
+  const R = el => el.getBoundingClientRect().right - clip.getBoundingClientRect().left;
+  const go = (x, ms, who = [ph, cur]) => who.forEach(el => { el.style.setProperty('--d', ms + 'ms'); el.style.setProperty('--x', x + 'px'); });
+  const click = () => { cur.classList.add('click'); setTimeout(() => cur.classList.remove('click'), 170); };
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  let running = false;
+
+  async function take() {
+    if (running) return;
+    running = true;
+    filler.classList.remove('gone', 'sel', 'done', 'cut'); rest.classList.remove('cut');
+    filler.style.maxWidth = '';
+    clip.classList.remove('played');
+    go(0, 0); await wait(1300);
+    go(X(filler), 900); await wait(1050); click(); filler.classList.add('cut');      // razor in
+    go(R(filler), 700); await wait(850); click(); rest.classList.add('cut');         // razor out
+    go((X(filler) + R(filler)) / 2, 500, [cur]); await wait(650); click();
+    filler.classList.add('sel'); await wait(500);                                     // select the dead air
+    cur.classList.add('key'); await wait(700); cur.classList.remove('key');           // hit Delete
+    filler.style.maxWidth = filler.scrollWidth + 'px'; void filler.offsetWidth;
+    filler.classList.add('gone'); rest.classList.remove('cut'); filler.classList.remove('cut');
+    go(X(rest) - 0, 900, [cur]); await wait(1000);                                    // ripple closes
+    filler.classList.remove('sel'); filler.classList.add('done');
+    go(R(h1) + 6, 0, [cur]);
+    go(0, 0, [ph]); await wait(60);
+    clip.classList.add('played'); go(R(h1), 2200, [ph]); await wait(2300);           // play it back
+    running = false;
+  }
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) take();
+  else { filler.classList.add('gone'); }
+  h1.addEventListener('click', () => { if (document.documentElement.dataset.mode !== 'build') take(); });
+})();

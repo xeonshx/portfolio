@@ -593,3 +593,100 @@ body::after {
   .trend { padding: 0 16px; }
   .trend-receipt { flex-direction: column; gap: 4px; }
 }
+
+/* ── Announcement bar: the X trend, above everything in EDIT ── */
+.xbar {
+  display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap;
+  background: #131210; color: #f2efe7; text-decoration: none;
+  font-size: .8rem; padding: 10px 16px; line-height: 1.3;
+}
+.xbar svg { width: 13px; height: 13px; fill: #f2efe7; flex: none; }
+.xbar span { opacity: .6; }
+.xbar b { font-weight: 700; }
+.xbar u { text-decoration: none; border-bottom: 1.5px solid var(--accent); padding-bottom: 1px; }
+.xbar:hover u { color: var(--accent); }
+:root[data-mode="build"] .xbar { display: none; }
+@media (max-width: 560px) { .xbar span { display: none; } }
+
+/* ── X trending banner above the viral clip ── */
+.x-banner {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  background: #131210; color: #f2efe7; text-decoration: none;
+  border-radius: 12px; padding: 12px 18px; margin-bottom: 14px; font-size: .86rem;
+}
+.x-banner svg { width: 16px; height: 16px; fill: #f2efe7; flex: none; }
+.xb-tag { font-weight: 800; }
+.xb-date { opacity: .55; }
+.xb-head { flex: 1; min-width: 200px; opacity: .85; }
+.xb-views { font: italic 900 1.25rem/1 'Archivo', sans-serif; letter-spacing: -.02em; }
+.xb-views small { font: 600 .72rem 'Inter', sans-serif; opacity: .6; margin-left: 4px; letter-spacing: 0; font-style: normal; }
+.xb-go { color: var(--accent); font-weight: 700; }
+.ix-trend { display: inline-flex; align-items: center; gap: 6px; margin-right: 14px; color: var(--text); }
+.ix-trend svg { width: 11px; height: 11px; fill: currentColor; }
+
+/* ── EDIT hero: the name is a clip on a timeline. The playhead parks at a
+   frame, the razor cuts, the pieces open a hairline gap; then a ripple
+   delete closes them and it goes again. Hover to take the razor yourself. */
+.rl { display: inline-block; position: relative; transition: margin-left .5s cubic-bezier(.16,1,.3,1); }
+.rl.cut { margin-left: .09em; }
+.filler { overflow: hidden; white-space: nowrap; vertical-align: bottom; color: #c4bdb0; position: relative;
+  transition: max-width .8s cubic-bezier(.65,0,.35,1), margin .8s cubic-bezier(.65,0,.35,1), opacity .5s; }
+.filler > span { display: inline-block; padding: 0 .08em; font-size: .5em; }
+.filler::after { content: ''; position: absolute; inset: 4% 0; background: var(--accent); opacity: 0; border-radius: 6px; transition: opacity .25s; }
+.filler.sel::after { opacity: .18; }
+.filler.sel { color: var(--accent); }
+.filler.gone { max-width: 0 !important; margin-left: 0 !important; opacity: 0; }
+.filler.gone.done { display: none; }
+.rl.cut::before {
+  content: ''; position: absolute; left: -.045em; top: 6%; bottom: 4%; width: 2px; margin-left: -1px;
+  background: var(--accent); opacity: .3; transform-origin: top;
+  animation: cutLine .6s cubic-bezier(.16,1,.3,1);
+}
+@keyframes cutLine { from { transform: scaleY(0); opacity: 1; } 40% { opacity: 1; } }
+.clip.razor-on .playhead {
+  animation: none; left: 0; transform: translateX(var(--x, 0px));
+  transition: transform var(--d, .9s) cubic-bezier(.65,0,.35,1);
+}
+.razor {
+  position: absolute; left: 0; top: -6px; z-index: 3; pointer-events: none;
+  transform: translateX(var(--x, 0px)); transition: transform var(--d, .9s) cubic-bezier(.65,0,.35,1);
+}
+.razor svg { width: 18px; height: 22px; display: block; margin-left: 2px; filter: drop-shadow(0 2px 3px rgba(0,0,0,.25));
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1); transform-origin: 3px 2px; }
+.razor em {
+  position: absolute; left: 16px; top: 18px; white-space: nowrap;
+  background: var(--accent); color: #fff; font: 600 .72rem/1 'Inter', sans-serif; font-style: normal;
+  padding: 5px 8px; border-radius: 4px 10px 10px 10px;
+}
+.razor.click svg { transform: scale(.82); }
+.razor kbd {
+  position: absolute; left: 16px; top: 44px; white-space: nowrap;
+  font: 700 .7rem/1 'Inter', sans-serif; color: var(--text); background: #fff;
+  border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 6px; padding: 5px 8px;
+  opacity: 0; transform: translateY(-4px); transition: opacity .2s, transform .2s;
+}
+.razor.key kbd { opacity: 1; transform: none; }
+.clip.played .playhead { transition-timing-function: linear; }
+:root[data-mode="build"] .razor { display: none; }
+@media (max-width: 640px) { .razor svg { width: 14px; height: 18px; } .razor em { font-size: .62rem; left: 12px; top: 14px; } }
+
+/* ── Quick-scroll rail: one short line per section, the active one long.
+   Hover the rail to read the names, click to jump. ── */
+.rail {
+  position: fixed; left: 18px; top: 50%; transform: translateY(-50%); z-index: 40;
+  display: flex; flex-direction: column; gap: 4px; padding: 10px 8px;
+}
+.rail button {
+  display: flex; align-items: center; gap: 12px; background: none; border: 0; padding: 4px 0; cursor: pointer;
+  color: var(--text); font: 700 .74rem 'Inter', sans-serif; letter-spacing: .02em; text-align: left;
+}
+.rail i { width: 14px; height: 2px; border-radius: 2px; background: var(--muted); opacity: .45; flex: none;
+  transition: width .35s cubic-bezier(.16,1,.3,1), opacity .2s, background .2s; }
+.rail button.on i { width: 28px; opacity: 1; background: var(--text); }
+.rail button:hover i { opacity: 1; background: var(--accent); }
+.rail span { opacity: 0; transform: translateX(-6px); white-space: nowrap; pointer-events: none;
+  background: var(--bg); padding: 2px 6px; border-radius: 4px;
+  transition: opacity .25s, transform .35s cubic-bezier(.16,1,.3,1); }
+.rail:hover span { opacity: 1; transform: none; pointer-events: auto; }
+.rail button.on span { color: var(--text); }
+@media (max-width: 760px) { .rail { display: none; } }
