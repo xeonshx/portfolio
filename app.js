@@ -75,7 +75,7 @@ function mountPlayer(el, videoId, tileEl) {
       // treat the embed as a real playlist and show its own title/channel/
       // prev-next overlay even with controls:0. We loop manually instead
       // (see onStateChange below) to keep the embed completely chrome-free.
-      playerVars: { mute: 1, autoplay: 1, controls: 0, rel: 0, playsinline: 1, modestbranding: 1 },
+      playerVars: { mute: 1, autoplay: 1, controls: 0, rel: 0, playsinline: 1, modestbranding: 1, cc_load_policy: 0, iv_load_policy: 3 },
       events: {
         // Belt-and-suspenders: some browsers ignore the autoplay param on
         // first paint, leaving YouTube's own branded "not playing yet" card
@@ -101,6 +101,9 @@ function mountPlayer(el, videoId, tileEl) {
             e.target.seekTo(0);
             e.target.playVideo();
           }
+          // YouTube turns its own captions on for muted autoplay; keep the
+          // edit's burned-in captions as the only ones on screen.
+          if (e.data === YT.PlayerState.PLAYING) { try { e.target.unloadModule('captions'); e.target.unloadModule('cc'); } catch (_) {} }
           if (!tileEl) return;
           const playing = e.data === YT.PlayerState.PLAYING;
           tileEl.classList.toggle('is-playing', playing);
@@ -247,16 +250,17 @@ function render() {
           const row = document.createElement('div');
           row.className = 'trend';
           row.appendChild(d);
-          const proof = document.createElement('a');
-          proof.className = 'trend-proof';
-          proof.href = t.url; proof.target = '_blank'; proof.rel = 'noopener';
-          proof.innerHTML = `
-            <p class="tp-kick"><i></i>Went viral on X</p>
-            <p class="tp-num">${t.views}</p>
-            <p class="tp-label">views on one repost before it was taken down</p>
-            <img src="${t.img}" alt="X trending story: AI Clips Revive The Office with Michael Scott Hiring Jensen Huang" loading="lazy">
-            <p class="tp-note">X built a trending story around it. That three and a half minute clip it leads with is this one. <b>See it on X ↗</b></p>`;
-          row.appendChild(proof);
+          const X = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.8L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z"/></svg>';
+          const chip = document.createElement('a');
+          chip.className = 'x-chip';
+          chip.href = t.url; chip.target = '_blank'; chip.rel = 'noopener';
+          chip.innerHTML = `${X}<b>Trending</b><span>${t.views} views</span>`;
+          d.appendChild(chip);
+          const rec = document.createElement('a');
+          rec.className = 'trend-receipt';
+          rec.href = t.url; rec.target = '_blank'; rec.rel = 'noopener';
+          rec.innerHTML = `<q>${t.headline}</q><small>X Trending, ${t.date} ↗</small>`;
+          row.appendChild(rec);
           s.appendChild(row);
           return;
         }
@@ -416,7 +420,7 @@ function renderIndex() {
     li.dataset.wide = r.wide ? '1' : '';
     list.appendChild(li);
   });
-  if (!indexReady) { indexReady = true; initIndexFloat(); }
+  indexReady = true;
 }
 
 function initIndexFloat() {

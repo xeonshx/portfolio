@@ -15,7 +15,7 @@
 <!-- ?v= must be bumped on every deploy that changes CSS/JS. GitHub Pages
      caches assets for ~10 min, so new HTML can otherwise arrive with old
      CSS (that mismatch is what blew the graph editor up full-page once). -->
-<link rel="stylesheet" href="styles.css?v=20">
+<link rel="stylesheet" href="styles.css?v=22">
 </head>
 <body>
 
@@ -61,14 +61,10 @@
     <div class="strip-track" id="stripTrack"></div>
   </section>
 
-  <!-- Services index: big kinetic rows. On hover a frame of that work
-       trails the cursor with ease-out lag, pivoting on an AE-style anchor
-       point. Rows are built by app.js from the video list. -->
+  <!-- Services index: big rows that jump to each section. Rows are
+       built by app.js from the video list. -->
   <section class="index" id="index" aria-label="What I cut">
     <ul class="index-list" id="indexList"></ul>
-    <div class="index-float" id="indexFloat" aria-hidden="true">
-      <div class="if-card"><img alt="" id="indexImg"><span class="if-anchor"></span></div>
-    </div>
   </section>
 
   <main id="reel"></main>
@@ -203,6 +199,6 @@
   <a class="bnav-hire" href="https://wa.me/60178708152" target="_blank" rel="noopener">HIRE ME ↗</a>
 </nav>
 
-<script src="app.js?v=20"></script>
+<script src="app.js?v=21"></script>
 </body>
 </html>
